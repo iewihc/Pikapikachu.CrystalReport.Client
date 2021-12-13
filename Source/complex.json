@@ -1,0 +1,16 @@
+﻿[
+  {
+    "nbr": "nbr1",
+    "acrmon": "acrmon1",
+    "amt": 123456,
+    "Shpbats":[ {"seq":"1" ,"name":"紅茶"} ]
+  },
+  {
+    "nbr": "nbr2",
+    "acrmon": "acrmon2",
+    "amt": 456789,
+    "Shpbats":[ {"seq":"1" ,"name":"奶茶"},{"seq":"2" ,"name":"綠茶"} ]
+  }
+]
+
+
