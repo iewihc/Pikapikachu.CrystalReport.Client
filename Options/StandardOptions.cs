@@ -30,6 +30,7 @@ namespace Pikapikachu.CrystalReport.Client.Options
         public bool DebugMode { get; set; }
 
 
+        
         public string DebugString { get; set; } = "[Debug]";
     }
 }

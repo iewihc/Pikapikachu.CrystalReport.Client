@@ -29,14 +29,14 @@ namespace Pikapikachu.CrystalReport.Client
         }
 
 
-        private static int DoTest(TestOptions options)
+        private static int DoTest(TestOptions opt)
         {
             var sw = new Stopwatch();
             sw.Start();
 
             var dir = Directory.GetCurrentDirectory();
 
-            var outputPDFPath = options.IsSimple ? Path.Combine(dir, "easy.pdf") : Path.Combine(dir, "complex.pdf");
+            var outputPDFPath = opt.IsSimple ? Path.Combine(dir, "easy.pdf") : Path.Combine(dir, "complex.pdf");
 
             if (File.Exists(outputPDFPath))
                 File.Delete(outputPDFPath);
@@ -45,10 +45,10 @@ namespace Pikapikachu.CrystalReport.Client
 
             var currentDirectory = Directory.GetCurrentDirectory();
 
-            var rdPath = options.IsSimple ? Path.Combine(dir, "Source\\easy.rpt") : Path.Combine(dir, "Source\\complex.rpt");
+            var rdPath = opt.IsSimple ? Path.Combine(dir, "Source\\easy.rpt") : Path.Combine(dir, "Source\\complex.rpt");
             rd.Load(rdPath);
 
-            var jsonPath = options.IsSimple ? Path.Combine(currentDirectory, "Source\\easy.json") : Path.Combine(currentDirectory, "Source\\complex.json");
+            var jsonPath = opt.IsSimple ? Path.Combine(currentDirectory, "Source\\easy.json") : Path.Combine(currentDirectory, "Source\\complex.json");
             var jsonString = File.ReadAllText(jsonPath);
 
             var ds = JsonStringConvertToDataSet(jsonString);
@@ -78,11 +78,6 @@ namespace Pikapikachu.CrystalReport.Client
 
             var outputXMLPath = Path.Combine(Directory.GetCurrentDirectory(), "source.xml");
             ds.WriteXml(outputXMLPath);
-            using (var writer = new StringWriter())
-            {
-                ds.WriteXml(writer);
-                writer.Write(outputXMLPath);
-            }
 
             Console.WriteLine(outputXMLPath);
 
@@ -124,6 +119,7 @@ namespace Pikapikachu.CrystalReport.Client
                 var outputPDFPath = Path.Combine(opt.OutputPath, $"{opt.FileName}.pdf");
                 var outputXMLPath = Path.Combine(opt.OutputPath, $"output.xml");
 
+                // source
                 if (!Directory.Exists(opt.OutputPath))
                     Directory.CreateDirectory(opt.OutputPath);
 
@@ -136,10 +132,18 @@ namespace Pikapikachu.CrystalReport.Client
                 Console.WriteLine($"{opt.DebugString}【報表名稱】: {opt.ReportName}");
                 Console.WriteLine($"{opt.DebugString}【輸出路徑】: {outputPDFPath}");
 
+                var jsonString = string.IsNullOrEmpty(opt.JsonText) ? File.ReadAllText(opt.JsonFilePath) : opt.JsonText;
+                var ds = JsonStringConvertToDataSet(jsonString);
+                if (opt.DebugMode)
+                {
+                    Console.WriteLine($"{opt.DebugString}【xmlPath】:{outputXMLPath}");
+                    Console.WriteLine($"{opt.DebugString}【jsonPath】:{opt.JsonFilePath}");
+                    ds.WriteXml(outputXMLPath);
+                }
+
                 var rd = new ReportDocument();
                 rd.Load(Path.Combine(opt.LoadReportPath, $"{opt.ReportName}.rpt"));
 
-                var jsonString = string.IsNullOrEmpty(opt.JsonText) ? File.ReadAllText(opt.JsonFilePath) : opt.JsonText;
 
                 if (opt.IsUseFactory)
                 {
@@ -155,14 +159,6 @@ namespace Pikapikachu.CrystalReport.Client
                 }
                 else
                 {
-                    var ds = JsonStringConvertToDataSet(jsonString);
-                    if (opt.DebugMode)
-                    {
-                        Console.WriteLine($"{opt.DebugString}【xmlPath】:{outputXMLPath}");
-                        Console.WriteLine($"{opt.DebugString}【jsonPath】:{opt.JsonFilePath}");
-                        ds.WriteXml(outputXMLPath);
-                    }
-
                     rd.SetDataSource(ds);
                 }
 
